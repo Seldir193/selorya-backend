@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     "apps.common",
     "apps.accounts",
     "apps.profiles",
+    "apps.categories",
+    "apps.listings",
 ]
 
 MIDDLEWARE = [
