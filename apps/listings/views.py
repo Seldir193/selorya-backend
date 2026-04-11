@@ -1,7 +1,12 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Listing
-from .serializers import ListingCreateSerializer, ListingSerializer
+from .permissions import IsSellerOrAdminOwner
+from .serializers import (
+    ListingCreateSerializer,
+    ListingSerializer,
+    ListingUpdateSerializer,
+)
 
 
 class ListingListView(generics.ListAPIView):
@@ -44,6 +49,20 @@ class MyListingListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Listing.objects.filter(
-            seller=self.request.user,
-        ).select_related("seller", "category")
+        queryset = Listing.objects.select_related("seller", "category")
+        if self.request.user.role == "admin" or self.request.user.is_superuser:
+            return queryset
+        return queryset.filter(seller=self.request.user)
+
+
+class ListingUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = Listing.objects.select_related("seller", "category")
+    serializer_class = ListingUpdateSerializer
+    permission_classes = [IsAuthenticated, IsSellerOrAdminOwner]
+    lookup_field = "slug"
+
+
+class ListingDeleteView(generics.DestroyAPIView):
+    queryset = Listing.objects.select_related("seller", "category")
+    permission_classes = [IsAuthenticated, IsSellerOrAdminOwner]
+    lookup_field = "slug"

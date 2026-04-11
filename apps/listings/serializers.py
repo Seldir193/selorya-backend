@@ -48,8 +48,37 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             "is_featured",
         )
 
+    def validate_status(self, value):
+        allowed = {"draft", "published", "sold", "archived"}
+        if value not in allowed:
+            raise serializers.ValidationError("Invalid listing status.")
+        return value
+
     def create(self, validated_data):
         return Listing.objects.create(
             seller=self.context["request"].user,
             **validated_data,
         )
+
+
+class ListingUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Listing
+        fields = (
+            "category",
+            "title",
+            "slug",
+            "description",
+            "price",
+            "condition",
+            "status",
+            "city",
+            "country",
+            "is_featured",
+        )
+
+    def validate_status(self, value):
+        allowed = {"draft", "published", "sold", "archived"}
+        if value not in allowed:
+            raise serializers.ValidationError("Invalid listing status.")
+        return value
