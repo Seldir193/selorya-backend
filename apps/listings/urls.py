@@ -3,6 +3,10 @@ from .views import (
     ListingCreateView,
     ListingDeleteView,
     ListingDetailView,
+    ListingImageCreateView,
+    ListingImageDeleteView,
+    ListingImageListView,
+    ListingImageUpdateView,
     ListingListView,
     ListingUpdateView,
     MyListingListView,
@@ -22,5 +26,25 @@ urlpatterns = [
         "<slug:slug>/delete/",
         ListingDeleteView.as_view(),
         name="listing-delete",
+    ),
+    path(
+        "<slug:slug>/images/",
+        ListingImageListView.as_view(),
+        name="listing-image-list",
+    ),
+    path(
+        "<slug:slug>/images/create/",
+        ListingImageCreateView.as_view(),
+        name="listing-image-create",
+    ),
+    path(
+        "images/<int:pk>/update/",
+        ListingImageUpdateView.as_view(),
+        name="listing-image-update",
+    ),
+    path(
+        "images/<int:pk>/delete/",
+        ListingImageDeleteView.as_view(),
+        name="listing-image-delete",
     ),
 ]
