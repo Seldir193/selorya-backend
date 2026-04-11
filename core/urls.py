@@ -9,6 +9,7 @@ urlpatterns = [
     path("api/profiles/", include("apps.profiles.urls")),
     path("api/categories/", include("apps.categories.urls")),
     path("api/listings/", include("apps.listings.urls")),
+    path("api/favorites/", include("apps.favorites.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

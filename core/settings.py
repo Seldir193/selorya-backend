@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "apps.profiles",
     "apps.categories",
     "apps.listings",
+    "apps.favorites",
 ]
 
 MIDDLEWARE = [
