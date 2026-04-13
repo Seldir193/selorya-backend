@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "apps.categories",
     "apps.listings",
     "apps.favorites",
+    "apps.orders",
 ]
 
 MIDDLEWARE = [
