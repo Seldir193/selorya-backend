@@ -52,7 +52,6 @@ class OrderCreateSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         listing_id = attrs["listing_id"]
-        quantity = attrs["quantity"]
         request = self.context["request"]
         listing = Listing.objects.select_related("seller").filter(
             id=listing_id,
@@ -63,8 +62,8 @@ class OrderCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError("Listing is not available.")
         if listing.seller_id == request.user.id:
             raise serializers.ValidationError("You cannot buy your own listing.")
+
         attrs["listing"] = listing
-        attrs["quantity"] = quantity
         return attrs
 
     def create(self, validated_data):
@@ -84,3 +83,22 @@ class OrderCreateSerializer(serializers.Serializer):
         )
         order.recalculate_totals()
         return order
+
+
+class OrderStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ("status",)
+
+    def validate_status(self, value):
+        allowed = {
+            "pending",
+            "confirmed",
+            "paid",
+            "cancelled",
+            "refunded",
+            "completed",
+        }
+        if value not in allowed:
+            raise serializers.ValidationError("Invalid order status.")
+        return value

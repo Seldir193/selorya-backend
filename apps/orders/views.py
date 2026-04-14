@@ -1,7 +1,11 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from .models import Order
-from .serializers import OrderCreateSerializer, OrderSerializer
+from .serializers import (
+    OrderCreateSerializer,
+    OrderSerializer,
+    OrderStatusUpdateSerializer,
+)
 
 
 class OrderListView(generics.ListAPIView):
@@ -42,3 +46,9 @@ class OrderCreateView(generics.CreateAPIView):
             context={"request": request},
         ).data
         return response
+
+
+class OrderStatusUpdateView(generics.UpdateAPIView):
+    queryset = Order.objects.prefetch_related("items").select_related("buyer")
+    serializer_class = OrderStatusUpdateSerializer
+    permission_classes = [IsAdminUser]
