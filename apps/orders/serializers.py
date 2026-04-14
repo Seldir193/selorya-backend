@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Order, OrderItem
+from apps.documents.services import ensure_cancellation, ensure_credit_note
 from apps.listings.models import Listing
 
 
@@ -102,3 +103,13 @@ class OrderStatusUpdateSerializer(serializers.ModelSerializer):
         if value not in allowed:
             raise serializers.ValidationError("Invalid order status.")
         return value
+
+    def update(self, instance, validated_data):
+        status = validated_data["status"]
+        instance.status = status
+        instance.save(update_fields=["status", "updated_at"])
+        if status == "cancelled":
+            ensure_cancellation(instance, "Cancellation generated after order update.")
+        if status == "refunded":
+            ensure_credit_note(instance, "Credit note generated after order update.")
+        return instance

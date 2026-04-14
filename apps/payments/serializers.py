@@ -1,6 +1,7 @@
 from django.utils import timezone
 from rest_framework import serializers
 from .models import Payment
+from .services import sync_payment_status
 from apps.orders.models import Order
 
 
@@ -42,14 +43,13 @@ class PaymentCreateSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         order = validated_data["order"]
-        payment = Payment.objects.create(
+        return Payment.objects.create(
             order=order,
             provider=validated_data["provider"],
             amount=order.total_amount,
             currency=order.currency,
             external_reference=validated_data.get("external_reference", ""),
         )
-        return payment
 
 
 class PaymentStatusUpdateSerializer(serializers.ModelSerializer):
@@ -66,10 +66,6 @@ class PaymentStatusUpdateSerializer(serializers.ModelSerializer):
         )
         if status == "paid" and not instance.paid_at:
             instance.paid_at = timezone.now()
-            instance.order.status = "paid"
-            instance.order.save(update_fields=["status", "updated_at"])
-        if status in {"refunded", "partially_refunded"}:
-            instance.order.status = "refunded"
-            instance.order.save(update_fields=["status", "updated_at"])
         instance.save()
+        sync_payment_status(instance)
         return instance

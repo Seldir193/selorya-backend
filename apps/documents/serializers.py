@@ -1,6 +1,6 @@
-from datetime import date
 from rest_framework import serializers
 from .models import Document
+from .services import create_document
 from apps.orders.models import Order
 
 
@@ -48,7 +48,6 @@ class DocumentCreateSerializer(serializers.Serializer):
             "dunning_notice",
         ]
     )
-    document_number = serializers.CharField(max_length=80)
     notes = serializers.CharField(required=False, allow_blank=True)
 
     def validate(self, attrs):
@@ -59,14 +58,9 @@ class DocumentCreateSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        order = validated_data["order"]
-        return Document.objects.create(
-            order=order,
-            recipient=order.buyer,
+        return create_document(
+            order=validated_data["order"],
             document_type=validated_data["document_type"],
-            document_number=validated_data["document_number"],
-            issue_date=date.today(),
-            status="generated",
             notes=validated_data.get("notes", ""),
         )
 
