@@ -6,6 +6,7 @@ from .serializers import (
     DocumentSerializer,
     DocumentStatusUpdateSerializer,
 )
+from .workflows import generate_and_send_document
 
 
 class DocumentListView(generics.ListAPIView):
@@ -40,3 +41,15 @@ class DocumentStatusUpdateView(generics.UpdateAPIView):
     queryset = Document.objects.select_related("order", "recipient")
     serializer_class = DocumentStatusUpdateSerializer
     permission_classes = [IsAdminUser]
+
+
+class DocumentSendView(generics.UpdateAPIView):
+    queryset = Document.objects.select_related("order", "recipient")
+    serializer_class = DocumentSerializer
+    permission_classes = [IsAdminUser]
+
+    def update(self, request, *args, **kwargs):
+        document = self.get_object()
+        generate_and_send_document(document)
+        serializer = DocumentSerializer(document, context={"request": request})
+        return generics.Response(serializer.data)
