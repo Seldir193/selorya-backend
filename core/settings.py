@@ -12,7 +12,17 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:4200")
 
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "")
+PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET", "")
+PAYPAL_BASE_URL = os.getenv(
+    "PAYPAL_BASE_URL",
+    "https://api-m.sandbox.paypal.com",
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",

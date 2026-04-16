@@ -69,3 +69,16 @@ class PaymentStatusUpdateSerializer(serializers.ModelSerializer):
         instance.save()
         sync_payment_status(instance)
         return instance
+
+
+class CheckoutInitSerializer(serializers.Serializer):
+    order_id = serializers.IntegerField()
+
+    def validate(self, attrs):
+        order = Order.objects.prefetch_related("items").filter(
+            id=attrs["order_id"]
+        ).first()
+        if not order:
+            raise serializers.ValidationError("Order not found.")
+        attrs["order"] = order
+        return attrs
