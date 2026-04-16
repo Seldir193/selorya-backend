@@ -3,10 +3,12 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import User
 from .serializers import (
     LoginSerializer,
     RegisterSerializer,
+    SeloryaTokenObtainPairSerializer,
     UserSerializer,
 )
 
@@ -54,3 +56,12 @@ class LogoutView(APIView):
             {"detail": "Logged out successfully."},
             status=status.HTTP_200_OK,
         )
+
+
+class JwtLoginView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+    serializer_class = SeloryaTokenObtainPairSerializer
+
+
+class JwtRefreshView(TokenRefreshView):
+    permission_classes = [AllowAny]

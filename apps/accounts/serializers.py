@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from apps.profiles.serializers import (
     CustomerProfileSerializer,
     SellerProfileSerializer,
@@ -37,7 +38,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop("password")
         return User.objects.create_user(password=password, **validated_data)
-
+    
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -55,3 +56,21 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("This account is inactive.")
         attrs["user"] = user
         return attrs
+    
+    
+class SeloryaTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = "email"
+
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["email"] = user.email
+        token["role"] = user.role
+        token["full_name"] = user.full_name
+        token["language"] = user.language
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data["user"] = UserSerializer(self.user).data
+        return data
