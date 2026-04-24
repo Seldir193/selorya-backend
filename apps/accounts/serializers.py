@@ -6,6 +6,7 @@ from apps.profiles.serializers import (
     SellerProfileSerializer,
 )
 from .models import User
+from .n8n import send_user_registered_to_n8n
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,7 +38,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        return User.objects.create_user(password=password, **validated_data)
+        user = User.objects.create_user(password=password, **validated_data)
+        send_user_registered_to_n8n(user)
+        return user
     
 
 class LoginSerializer(serializers.Serializer):

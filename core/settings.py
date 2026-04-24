@@ -1,8 +1,10 @@
 from datetime import timedelta
 from pathlib import Path
+from dotenv import load_dotenv
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() == "true"
@@ -137,7 +139,11 @@ DEFAULT_FROM_EMAIL = "no-reply@selorya.com"
 
 
 
-
+N8N_WEBHOOK_BASE_URL = os.getenv("N8N_WEBHOOK_BASE_URL", "")
+N8N_REGISTRATION_WEBHOOK_PATH = os.getenv(
+    "N8N_REGISTRATION_WEBHOOK_PATH",
+    "/webhook/selorya-user-registered",
+)
 
 
 
